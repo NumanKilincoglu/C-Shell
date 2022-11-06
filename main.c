@@ -8,24 +8,32 @@
 #define MAX_INPUT 64
 #define HISTORY 64
 
-char commandInput[BUFF_LEN] = {'\0'};
-char *token[MAX_TOKEN] = {'\0'};
+char commandInput[BUFF_LEN];
+char *token[MAX_TOKEN];
 
 int main()
 {
     while (1)
     {
-        printf("MyShell >>");
+        clearArrays(commandInput, token, MAX_INPUT);
+        printf("myshell >>");
         if (readCommandLine(commandInput, MAX_INPUT))
         {
             int cmdLen = commandLength(commandInput);
+            commandToToken(commandInput, token, MAX_INPUT);
 
-            printt(commandInput, cmdLen);
-            printf("%d-- ", strlen(commandInput));
+            print(commandInput, cmdLen);
+            printf("\n%d-- \n", strlen(commandInput));
+
+            if (strcmp(commandInput, "exit") == 0)
+            {
+                break;
+            }
         }
         else
         {
             printf("\nLutfen gecerli bir komut giriniz!\n");
+            continue;
         }
     }
 

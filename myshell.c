@@ -2,6 +2,42 @@
 #include <stdio.h>
 #include <string.h>
 
+#define BUFF_LEN 64
+#define MAX_TOKEN 32
+#define MAX_INPUT 64
+#define HISTORY 64
+
+char commandInput[BUFF_LEN];
+char *token[MAX_TOKEN];
+
+int main()
+{
+    while (1)
+    {
+        clearArrays(commandInput, token);
+        printf("myshell >>");
+        if (readCommandLine(commandInput, MAX_INPUT))
+        {
+            int cmdLen = commandLength(commandInput);
+            commandToToken(commandInput, token, MAX_INPUT);
+            print(commandInput, cmdLen);
+            
+
+            if (strcmp(commandInput, "exit") == 0)
+            {
+                break;
+            }
+        }
+        else
+        {
+            printf("\nLutfen gecerli bir komut giriniz!\n");
+            continue;
+        }
+    }
+
+    return 0;
+}
+
 int readCommandLine(char *input, int maxLength)
 {
     if (!fgets(input, maxLength, stdin))
@@ -28,16 +64,16 @@ int commandToToken(char *input, char *tokens[], int length)
     printf("*****>*****\n");
     int index = 0;
     tokens[index] = strtok(input, " \t\n");
-    printf("%s-->", tokens[index]);
 
     while (input[index] != NULL)
     {
         tokens[++index] = strtok(NULL, " \t\n");
     }
+    printStr(**tokens, length);
 
 }
 
-void clearArrays(char *commandInput, char **tokens, int MAX_INPUT)
+void clearArrays(char *commandInput, char **tokens)
 {
     memset(commandInput, '\0', MAX_INPUT);
     memset(tokens, '\0', sizeof(tokens));
@@ -52,4 +88,13 @@ void print(char *input, int lineLength)
         printf("%c", input[index++]);
     }
     printf("\n%d --> ", lineLength);
+}
+
+
+void printStr(char **input, int lineLength)
+{
+    int index = 0;
+
+    printf("%s ", input[index++]);
+ 
 }

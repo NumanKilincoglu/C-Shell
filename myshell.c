@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <dirent.h>
 
 #define BUFF_LEN 64
 #define MAX_TOKEN 32
@@ -25,7 +26,7 @@ int main()
             switch (choice)
             {
             case 1:
-                exit(0);
+                exit(1);
                 break;
             case 2:
                 runBash();
@@ -56,18 +57,49 @@ int main()
 
 void runBash()
 {
+    int i;
+    int pid = fork();
+
+    if (pid == 0)
+    {
+        i = execve("/bin/bash", NULL, NULL);
+        perror("bash calisamadi\n");
+    }
+    else
+    {
+        printf("Ana program\n");
+        wait(&i);
+    }
 }
 
 void clearTerminal()
 {
+    system("clear");
 }
 
 void list()
 {
+    DIR *dir;
+    struct dirent *directory;
+    dir = opendir(".");
+    if (dir)
+    {
+        while ((directory = readdir(dir)) != NULL)
+        {
+            printf("%s\t", directory->d_name);
+        }
+        closedir(dir);
+    }
+    puts("\n");
 }
 
 void cat()
 {
+    printf("cat:");
+    for (int i = 1; i < tokenCount; i++)
+    {
+        printf("%s ", token[i]);
+    }
 }
 
 void runExecx()

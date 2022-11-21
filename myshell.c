@@ -8,6 +8,7 @@
 #define HISTORY 64
 
 char commandInput[BUFF_LEN];
+// char bufferArray[BUFF_LEN];
 char *token[MAX_TOKEN];
 int tokenCount = 0;
 
@@ -19,12 +20,26 @@ int main()
         printf("\nmyshell >>");
         if (readCommandLine(commandInput, MAX_INPUT))
         {
-            int cmdLen = commandLength(commandInput);
-            printf("%d --\n", cmdLen);
-            commandToToken(cmdLen);
-
-            if (strcmp(commandInput, "exit") == 0)
+            commandToToken();
+            int choice = handleCommand();
+            switch (choice)
             {
+            case 1:
+                exit(0);
+                break;
+            case 2:
+                runBash();
+            case 3:
+                clearTerminal();
+                break;
+            case 4:
+                list();
+            case 5:
+                cat();
+                break;
+            case 6:
+                runExecx();
+            default:
                 break;
             }
         }
@@ -37,6 +52,26 @@ int main()
     printf("cikti\n");
 
     return 0;
+}
+
+void runBash()
+{
+}
+
+void clearTerminal()
+{
+}
+
+void list()
+{
+}
+
+void cat()
+{
+}
+
+void runExecx()
+{
 }
 
 int readCommandLine(char *input, int maxLength)
@@ -60,28 +95,77 @@ int commandLength(char *input)
     return strlen(input);
 }
 
-int commandToToken(int lineLength)
+int commandToToken()
 {
-    printf("*****>*****\n");
     int index = 0;
-    token[index] = strtok(commandInput, " ");
-    tokenCount++;
-    int se = 0;
-    while (commandInput[index] != '\0' && index <= lineLength)
-    {   //printf("%s -: ", token[index]);
-        token[++index] = strtok('\0', " ");
-        printf("%d ", se++);
-        tokenCount++;
-    }
-    printf("%d ", se);
-    //printf(" %d ", tokenCount);
+    char *bufferArray = strdup(commandInput);
+    char *str = strtok(bufferArray, " ");
 
-    for (int i = 0; i < tokenCount - 1; i++)
+    while (str != NULL)
     {
-        printf("%s ", token[i]);
+        tokenCount++;
+        token[index++] = str;
+        str = strtok(NULL, " ");
+    }
+}
+
+int handleCommand()
+{
+    if (strcmp(token[0], "exit") == 0)
+    {
+        return 1;
+    }
+    else if (strcmp(token[0], "bash") == 0)
+    {
+        return 2;
+    }
+    else if (strcmp(token[0], "clear") == 0)
+    {
+        return 3;
+    }
+    else if (strcmp(token[0], "ls") == 0)
+    {
+        return 4;
+    }
+    else if (strcmp(token[0], "cat") == 0)
+    {
+        return 5;
+    }
+    else if (strcmp(token[0], "execx") == 0 && strcmp(token[1], "-t") == 0 && strcmp(token[3], "writef") == 0 && strcmp(token[4], "-f") == 0)
+    {
+        if (checkChar(token[2]) && token[5] != NULL)
+        {
+            return 10;
+        }
+        return -3;
+    }
+    else if (strcmp(token[0], "execx") == 0 && strcmp(token[1], "-t") == 0 && strcmp(token[3], "writef") == 0)
+    {
+        if (checkChar(token[2]))
+        {
+            return 6;
+        }
+        return -1;
     }
 
-    printf("\n*****>*****\n");
+    else if (strcmp(token[0], "bash") == 0)
+    {
+        return 7;
+    }
+    else
+    {
+        return -2;
+    }
+}
+
+int checkChar(char *str)
+{
+    for (int i = 0; i < strlen(str); i++)
+    {
+        if (str[i] > '9' || str[i] < '0')
+            return 0;
+    }
+    return 1;
 }
 
 void settings()
@@ -100,4 +184,12 @@ void print(char *input, int lineLength)
         printf("%c", input[index++]);
     }
     printf("\n%d --> ", lineLength);
+}
+
+void printTokens()
+{
+    for (int i = 0; i < tokenCount; i++)
+    {
+        printf("\n%d: %s\n", i, token[i]);
+    }
 }

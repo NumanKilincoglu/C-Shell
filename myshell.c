@@ -9,19 +9,19 @@
 
 char commandInput[BUFF_LEN];
 char *token[MAX_TOKEN];
+int tokenCount = 0;
 
 int main()
 {
     while (1)
     {
-        clearArrays(commandInput, token);
-        printf("myshell >>");
+        settings(commandInput, token);
+        printf("\nmyshell >>");
         if (readCommandLine(commandInput, MAX_INPUT))
         {
             int cmdLen = commandLength(commandInput);
-            commandToToken(commandInput, token, MAX_INPUT);
-            print(commandInput, cmdLen);
-            
+            printf("%d --\n", cmdLen);
+            commandToToken(cmdLen);
 
             if (strcmp(commandInput, "exit") == 0)
             {
@@ -34,6 +34,7 @@ int main()
             continue;
         }
     }
+    printf("cikti\n");
 
     return 0;
 }
@@ -59,24 +60,35 @@ int commandLength(char *input)
     return strlen(input);
 }
 
-int commandToToken(char *input, char *tokens[], int length)
+int commandToToken(int lineLength)
 {
     printf("*****>*****\n");
     int index = 0;
-    tokens[index] = strtok(input, " \t\n");
-
-    while (input[index] != NULL)
-    {
-        tokens[++index] = strtok(NULL, " \t\n");
+    token[index] = strtok(commandInput, " ");
+    tokenCount++;
+    int se = 0;
+    while (commandInput[index] != '\0' && index <= lineLength)
+    {   //printf("%s -: ", token[index]);
+        token[++index] = strtok('\0', " ");
+        printf("%d ", se++);
+        tokenCount++;
     }
-    printStr(**tokens, length);
+    printf("%d ", se);
+    //printf(" %d ", tokenCount);
 
+    for (int i = 0; i < tokenCount - 1; i++)
+    {
+        printf("%s ", token[i]);
+    }
+
+    printf("\n*****>*****\n");
 }
 
-void clearArrays(char *commandInput, char **tokens)
+void settings()
 {
+    tokenCount = 0;
     memset(commandInput, '\0', MAX_INPUT);
-    memset(tokens, '\0', sizeof(tokens));
+    memset(token, '\0', sizeof(token));
 }
 
 void print(char *input, int lineLength)
@@ -88,13 +100,4 @@ void print(char *input, int lineLength)
         printf("%c", input[index++]);
     }
     printf("\n%d --> ", lineLength);
-}
-
-
-void printStr(char **input, int lineLength)
-{
-    int index = 0;
-
-    printf("%s ", input[index++]);
- 
 }

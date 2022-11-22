@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
+#include <signal.h>
+#include <sys/wait.h>
 
 #define BUFF_LEN 64
 #define MAX_TOKEN 32
@@ -13,6 +15,8 @@ char commandInput[BUFF_LEN];
 char *token[MAX_TOKEN];
 int tokenCount = 0;
 
+int pipefd[2];
+
 int main()
 {
     while (1)
@@ -21,6 +25,11 @@ int main()
         printf("\nmyshell >>");
         if (readCommandLine(commandInput, MAX_INPUT))
         {
+            if (pipe(pipefd) < 0)
+            {
+                perror("pipe");
+                exit(1);
+            }
             commandToToken();
             int choice = handleCommand();
             switch (choice)
@@ -30,16 +39,25 @@ int main()
                 break;
             case 2:
                 runBash();
+                break;
             case 3:
                 clearTerminal();
                 break;
             case 4:
                 list();
+                break;
             case 5:
                 cat();
                 break;
             case 6:
                 runExecx();
+                break;
+            case 7:
+                runExecx();
+                break;
+            case 8:
+                helpScreen();
+                break;
             default:
                 break;
             }
@@ -63,11 +81,10 @@ void runBash()
     if (pid == 0)
     {
         i = execve("/bin/bash", NULL, NULL);
-        perror("bash calisamadi\n");
+        perror("\nBash calistirilirken sorun olustu!\n");
     }
     else
     {
-        printf("Ana program\n");
         wait(&i);
     }
 }
@@ -82,7 +99,7 @@ void list()
     DIR *dir;
     struct dirent *directory;
     dir = opendir(".");
-    if (dir)
+    if (dir)    
     {
         while ((directory = readdir(dir)) != NULL)
         {
@@ -104,6 +121,22 @@ void cat()
 
 void runExecx()
 {
+}
+
+void writef(){
+
+}
+
+void helpScreen()
+{
+    printf("\n-------Shell Commands-------\n");
+    printf("\nExit shell: exit\n");
+    printf("\nList directory: ls\n");
+    printf("\nClear terminal: clear\n");
+    printf("\ncat: cat\n");
+    printf("\nexecx : execx -t 3 writef -f filename\n");
+    printf("\nHelp screen: help\n");
+    printf("\n****************************\n");
 }
 
 int readCommandLine(char *input, int maxLength)
@@ -167,7 +200,7 @@ int handleCommand()
     {
         if (checkChar(token[2]) && token[5] != NULL)
         {
-            return 10;
+            return 6;
         }
         return -3;
     }
@@ -175,14 +208,14 @@ int handleCommand()
     {
         if (checkChar(token[2]))
         {
-            return 6;
+            return 7;
         }
         return -1;
     }
 
-    else if (strcmp(token[0], "bash") == 0)
+    else if (strcmp(token[0], "help") == 0)
     {
-        return 7;
+        return 8;
     }
     else
     {

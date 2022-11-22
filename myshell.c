@@ -49,7 +49,7 @@ int main()
             case 5:
                 cat();
                 break;
-            case 6:
+            case 11:
                 runExecx();
                 break;
             case 7:
@@ -59,6 +59,7 @@ int main()
                 helpScreen();
                 break;
             default:
+                printf("hicibiri");
                 break;
             }
         }
@@ -99,7 +100,7 @@ void list()
     DIR *dir;
     struct dirent *directory;
     dir = opendir(".");
-    if (dir)    
+    if (dir)
     {
         while ((directory = readdir(dir)) != NULL)
         {
@@ -121,10 +122,25 @@ void cat()
 
 void runExecx()
 {
-}
+    int ev = 0;
+    int pid = fork();
 
-void writef(){
+    if (pid == 0)
+    {
+        char *arg[2];
+        strcpy(arg[0], token[1]);
+        arg[1] = NULL;
 
+        ev = execv("writef", arg, NULL);
+        perror("\nwritef calistirilamadi!\n");
+    }
+    else
+    {
+       char input[100];
+        write(pipefd[1], "numan yaz buna", 15);
+        wait(&ev);
+        close(pipefd[1]);
+    }
 }
 
 void helpScreen()
@@ -196,6 +212,10 @@ int handleCommand()
     {
         return 5;
     }
+    else if (strcmp(token[0], "writef") == 0)
+    {
+        return 11;
+    }
     else if (strcmp(token[0], "execx") == 0 && strcmp(token[1], "-t") == 0 && strcmp(token[3], "writef") == 0 && strcmp(token[4], "-f") == 0)
     {
         if (checkChar(token[2]) && token[5] != NULL)
@@ -208,6 +228,7 @@ int handleCommand()
     {
         if (checkChar(token[2]))
         {
+            printf("burda");
             return 7;
         }
         return -1;

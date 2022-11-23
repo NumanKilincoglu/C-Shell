@@ -6,9 +6,9 @@
 int main(int argc, char *argv[])
 {
 
-    char string[15];
+    char string[50] = {'\0'};
 
-    read(3, string, 15);
+    read(3, string, 50);
     printf("alt program: %s", string);
 
     printf("\n%d--%d-- %s\n", getpid(), getppid(), argv[0]);
@@ -25,6 +25,7 @@ int writeFile(char *fileName, char *string)
 
     if (file)
     {
+        printf("\nGonderilen: %s\n", string);
         time_t curTime;
         time(&curTime);
         char pid[15] = {0};

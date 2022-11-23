@@ -19,17 +19,17 @@ int pipefd[2];
 
 int main()
 {
+    if (pipe(pipefd) < 0)
+    {
+        perror("pipe");
+        exit(1);
+    }
     while (1)
     {
         settings(commandInput, token);
         printf("\nmyshell >>");
         if (readCommandLine(commandInput, MAX_INPUT))
         {
-            if (pipe(pipefd) < 0)
-            {
-                perror("pipe");
-                exit(1);
-            }
             commandToToken();
             int choice = handleCommand();
             switch (choice)
@@ -50,9 +50,6 @@ int main()
                 cat();
                 break;
             case 11:
-                runExecx();
-                break;
-            case 7:
                 runExecx();
                 break;
             case 8:
@@ -122,6 +119,7 @@ void cat()
 
 void runExecx()
 {
+
     int ev = 0;
     int pid = fork();
 
@@ -133,13 +131,16 @@ void runExecx()
 
         ev = execv("writef", arg, NULL);
         perror("\nwritef calistirilamadi!\n");
+        // close(pipefd[1]);
     }
     else
     {
-       char input[100];
-        write(pipefd[1], "numan yaz buna", 15);
+        char input[100]={'\0'};
+        printf("INput gir.\n");
+        fgets(input, 50, stdin);
+        write(pipefd[1], input, 50);
         wait(&ev);
-        close(pipefd[1]);
+        // close(pipefd[1]);
     }
 }
 

@@ -11,7 +11,6 @@
 #define HISTORY 64
 
 char commandInput[BUFF_LEN];
-// char bufferArray[BUFF_LEN];
 char *token[MAX_TOKEN];
 int tokenCount = 0;
 
@@ -49,14 +48,20 @@ int main()
             case 5:
                 cat();
                 break;
-            case 11:
-                runExecx();
+            case 6:
+                writef();
+                break;
+            case 7:
+                runExec();
                 break;
             case 8:
+                runExecParam();
+                break;
+            case 9:
                 helpScreen();
                 break;
             default:
-                printf("hicibiri");
+                handleErrors(choice);
                 break;
             }
         }
@@ -117,9 +122,36 @@ void cat()
     }
 }
 
-void runExecx()
+void runExec()
 {
+    int i;
+    int pid = fork();
+    printf("burada1\n");
 
+    if (pid == 0)
+    {
+        printf("burada\n");
+        char *arg[2];
+        strcpy(arg[0], token[2]);
+        strcpy(arg[1], token[3]);
+        printf("girdi ni\n");
+        i = execv("execx", arg, NULL);
+        perror("\nexecx calistirilamadi!\n");
+    }
+    else
+    {
+        printf("ana prog");
+        wait(&i);
+    }
+}
+
+void runExecParam()
+{
+    printf("eunparam");
+}
+
+void writef()
+{
     int ev = 0;
     int pid = fork();
 
@@ -128,32 +160,30 @@ void runExecx()
         char *arg[2];
         strcpy(arg[0], token[1]);
         arg[1] = NULL;
-
         ev = execv("writef", arg, NULL);
         perror("\nwritef calistirilamadi!\n");
-        // close(pipefd[1]);
     }
     else
     {
-        char input[100]={'\0'};
-        printf("INput gir.\n");
-        fgets(input, 50, stdin);
-        write(pipefd[1], input, 50);
+        char input[100] = {'\0'};
+        printf("Input giriniz:\n");
+        fgets(input, 100, stdin);
+        write(pipefd[1], input, strlen(input));
         wait(&ev);
-        // close(pipefd[1]);
     }
 }
 
 void helpScreen()
 {
-    printf("\n-------Shell Commands-------\n");
+    printf("\n--------------Shell Commands--------------\n");
     printf("\nExit shell: exit\n");
-    printf("\nList directory: ls\n");
+    printf("\nDisplay directory: ls\n");
     printf("\nClear terminal: clear\n");
-    printf("\ncat: cat\n");
+    printf("\ncat: cat (parameter)\n");
+    printf("\nwritef : writef -f filename\n");
     printf("\nexecx : execx -t 3 writef -f filename\n");
     printf("\nHelp screen: help\n");
-    printf("\n****************************\n");
+    printf("\n******************************************\n");
 }
 
 int readCommandLine(char *input, int maxLength)
@@ -193,19 +223,21 @@ int commandToToken()
 
 int handleCommand()
 {
-    if (strcmp(token[0], "exit") == 0)
+    printf("%d", tokenCount);
+
+    if (tokenCount == 1 && strcmp(token[0], "exit") == 0)
     {
         return 1;
     }
-    else if (strcmp(token[0], "bash") == 0)
+    else if (tokenCount == 1 && strcmp(token[0], "bash") == 0)
     {
         return 2;
     }
-    else if (strcmp(token[0], "clear") == 0)
+    else if (tokenCount == 1 && strcmp(token[0], "clear") == 0)
     {
         return 3;
     }
-    else if (strcmp(token[0], "ls") == 0)
+    else if (tokenCount == 1 && strcmp(token[0], "ls") == 0)
     {
         return 4;
     }
@@ -215,33 +247,55 @@ int handleCommand()
     }
     else if (strcmp(token[0], "writef") == 0)
     {
-        return 11;
-    }
-    else if (strcmp(token[0], "execx") == 0 && strcmp(token[1], "-t") == 0 && strcmp(token[3], "writef") == 0 && strcmp(token[4], "-f") == 0)
-    {
-        if (checkChar(token[2]) && token[5] != NULL)
+        if (token[1] == NULL)
         {
-            return 6;
+            return -1;
         }
-        return -3;
+        return 6;
     }
-    else if (strcmp(token[0], "execx") == 0 && strcmp(token[1], "-t") == 0 && strcmp(token[3], "writef") == 0)
+    else if (tokenCount == 4 && strcmp(token[0], "execx") == 0 && strcmp(token[1], "-t") == 0)
+
     {
-        if (checkChar(token[2]))
+        printf("token");
+        if (token[2] != NULL && checkChar(token[2]) && token[3] != NULL)
         {
-            printf("burda");
             return 7;
         }
-        return -1;
+        return -2;
+    }
+    else if (tokenCount == 6 && strcmp(token[0], "execx") == 0 && strcmp(token[1], "-t") == 0 && strcmp(token[4], "-f") == 0)
+    {
+        if (token[2] != NULL && checkChar(token[2]) && token[3] != NULL && token[5] != NULL)
+        {
+            return 8;
+        }
+        return -3;
     }
 
     else if (strcmp(token[0], "help") == 0)
     {
-        return 8;
+        return 9;
     }
     else
     {
-        return -2;
+        return -4;
+    }
+}
+
+void handleErrors(int errorCode)
+{
+
+    if (errorCode == -1)
+    {
+        printf("\nLutfen writef komutunun parametrelerini kontrol edin!\nKomutlari gormek icin 'help' yazabilirsiniz\n");
+    }
+    if (errorCode == -2 || errorCode == -3)
+    {
+        printf("\nLutfen execx komutunun parametrelerini kontrol edin!\nKomutlari gormek icin 'help' yazabilirsiniz\n");
+    }
+    if (errorCode == -4)
+    {
+        printf("\nLutfen girdiginiz komutu kontrol edin!\nKomutlari gormek icin 'help' yazabilirsiniz\n");
     }
 }
 

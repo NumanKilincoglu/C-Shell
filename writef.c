@@ -2,40 +2,33 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#define BUFFER_LENGTH 100
+#define PID_LENGTH 25
 
 int main(int argc, char *argv[])
 {
-
-    char string[50] = {'\0'};
-
-    read(3, string, 50);
-    printf("alt program: %s", string);
-
-    printf("\n%d--%d-- %s\n", getpid(), getppid(), argv[0]);
-    printf("%d", writeFile(argv[0], string));
-    printf("cikti");
+    char string[BUFFER_LENGTH] = {'\0'};
+    read(3, string, BUFFER_LENGTH);
+    writeFile(argv[0], string);
     return 0;
 }
 
 int writeFile(char *fileName, char *string)
 {
     FILE *file = NULL;
-    printf("dosyaya gir\n");
     file = fopen(fileName, "a");
 
     if (file)
     {
-        printf("\nGonderilen: %s\n", string);
+        char pid[PID_LENGTH] = {0};
+        char ppid[PID_LENGTH] = {0};
         time_t curTime;
         time(&curTime);
-        char pid[15] = {0};
-        char ppid[25] = {0};
-        sprintf(pid, "\nPID:%d ", getpid());
+        sprintf(pid, "PID:%d ", getpid());
         sprintf(ppid, "PPID:%d ", getppid());
         fputs(string, file);
         fputs(pid, file);
         fputs(ppid, file);
-
         fputs(ctime(&curTime), file);
         fputs("\n", file);
         fclose(file);

@@ -9,7 +9,6 @@ int main(int argc, char *argv[])
 {
     char string[BUFFER_LENGTH] = {'\0'};
     read(0, string, BUFFER_LENGTH);
-    printf("------> %s\n", argv[0]);
     writeFile(argv[0], string);
     return 0;
 }

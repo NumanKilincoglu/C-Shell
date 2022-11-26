@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
-#include <signal.h>
 #include <sys/wait.h>
+
 #define BUFFER_LENGTH 100
 #define PID_LENGTH 25
 int pipeArray[2];
@@ -39,7 +39,7 @@ void doExec(char *args[], int processNum)
         else
         {
             char input[100] = {'\0'};
-            printf("DEF giriniz:\n");
+            printf("Input giriniz:\n");
             // fgets(input, 100, stdin);
             write(pipeArray[1], input, strlen(input));
             wait(&ev);

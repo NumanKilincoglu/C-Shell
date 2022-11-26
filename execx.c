@@ -4,17 +4,13 @@
 #include <dirent.h>
 #include <signal.h>
 #include <sys/wait.h>
-
 #define BUFFER_LENGTH 100
 #define PID_LENGTH 25
-int pipeArray[3][2];
+int pipeArray[2];
 
 int main(int argc, char *argv[])
 {
     int processNum = atoi(argv[0]);
-
-    printf("%s %s\n", argv[0], argv[1]);
-
     doExec(argv, processNum);
     return 0;
 }
@@ -22,21 +18,19 @@ int main(int argc, char *argv[])
 void doExec(char *args[], int processNum)
 {
     int ev;
-    int pids[processNum];
     char *arg[2];
     arg[0] = args[1];
     arg[1] = NULL;
-    for (int i = 0; i < processNum; i++)
+
+    if (pipe(pipeArray) < 0)
     {
-        if (pipe(pipeArray[i]) < 0)
-        {
-            return -1;
-        }
+        return -1;
     }
+
     for (int i = 0; i < processNum; i++)
     {
-        pids[i] = fork();
-        if (pids[i] == 0) // child process
+        int pid = fork();
+        if (pid == 0) // child process
         {
             ev = execv("writef", arg, NULL);
             perror("Hata var");
@@ -45,11 +39,10 @@ void doExec(char *args[], int processNum)
         else
         {
             char input[100] = {'\0'};
-            printf("Input giriniz:\n");
+            printf("DEF giriniz:\n");
             // fgets(input, 100, stdin);
-            write(pipeArray[i][1], input, strlen(input));
+            write(pipeArray[1], input, strlen(input));
             wait(&ev);
-            close(pipeArray[i][1]);
         }
     }
 }

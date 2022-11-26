@@ -156,8 +156,8 @@ void writef()
     else
     {
         char input[100] = {'\0'};
-        printf("Input giriniz:\n");
-        fgets(input, 100, stdin);
+        printf("ABC giriniz:\n");
+        // fgets(input, 100, stdin);
         write(pipefd[1], input, strlen(input));
         wait(&ev);
     }

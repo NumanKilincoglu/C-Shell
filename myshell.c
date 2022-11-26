@@ -18,11 +18,7 @@ int pipefd[2];
 
 int main()
 {
-    if (pipe(pipefd) < 0)
-    {
-        perror("pipe");
-        exit(1);
-    }
+
     while (1)
     {
         settings(commandInput, token);
@@ -52,12 +48,9 @@ int main()
                 writef();
                 break;
             case 7:
-                runExec();
-                break;
-            case 8:
                 runExecParam();
                 break;
-            case 9:
+            case 8:
                 helpScreen();
                 break;
             default:
@@ -122,36 +115,33 @@ void cat()
     }
 }
 
-void runExec()
+void runExecParam()
 {
+    char *arg[2];
+    arg[0] = token[2];
+    arg[1] = token[5];
+    arg[2] = NULL;
     int i;
     int pid = fork();
-    printf("burada1\n");
 
     if (pid == 0)
     {
-        printf("burada\n");
-        char *arg[2];
-        strcpy(arg[0], token[2]);
-        strcpy(arg[1], token[3]);
-        printf("girdi ni\n");
         i = execv("execx", arg, NULL);
         perror("\nexecx calistirilamadi!\n");
     }
     else
     {
-        printf("ana prog");
         wait(&i);
     }
 }
 
-void runExecParam()
-{
-    printf("eunparam");
-}
-
 void writef()
 {
+    if (pipe(pipefd) < 0)
+    {
+        perror("pipe");
+        exit(1);
+    }
     int ev = 0;
     int pid = fork();
 
@@ -171,6 +161,7 @@ void writef()
         write(pipefd[1], input, strlen(input));
         wait(&ev);
     }
+    close(pipefd);
 }
 
 void helpScreen()
@@ -223,8 +214,6 @@ int commandToToken()
 
 int handleCommand()
 {
-    printf("%d", tokenCount);
-
     if (tokenCount == 1 && strcmp(token[0], "exit") == 0)
     {
         return 1;
@@ -253,28 +242,21 @@ int handleCommand()
         }
         return 6;
     }
-    else if (tokenCount == 4 && strcmp(token[0], "execx") == 0 && strcmp(token[1], "-t") == 0)
-
+    else if (tokenCount == 6)
     {
-        printf("token");
-        if (token[2] != NULL && checkChar(token[2]) && token[3] != NULL)
+        if (strcmp(token[0], "execx") == 0 && strcmp(token[1], "-t") == 0 && strcmp(token[4], "-f") == 0)
         {
-            return 7;
-        }
-        return -2;
-    }
-    else if (tokenCount == 6 && strcmp(token[0], "execx") == 0 && strcmp(token[1], "-t") == 0 && strcmp(token[4], "-f") == 0)
-    {
-        if (token[2] != NULL && checkChar(token[2]) && token[3] != NULL && token[5] != NULL)
-        {
-            return 8;
+            if (token[2] != NULL && checkChar(token[2]) && token[3] != NULL && token[5] != NULL)
+            {
+                return 7;
+            }
         }
         return -3;
     }
 
-    else if (strcmp(token[0], "help") == 0)
+    else if (tokenCount == 1 && strcmp(token[0], "help") == 0)
     {
-        return 9;
+        return 8;
     }
     else
     {

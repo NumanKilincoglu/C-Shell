@@ -117,10 +117,11 @@ void cat()
 
 void runExecParam()
 {
-    char *arg[2];
+    char *arg[4];
     arg[0] = token[2];
     arg[1] = token[5];
-    arg[2] = NULL;
+    arg[2] = token[3];
+    arg[3] = NULL;
     int i;
     int pid = fork();
 

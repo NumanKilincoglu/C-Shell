@@ -4,8 +4,6 @@
 #include <dirent.h>
 #include <sys/wait.h>
 
-#define BUFFER_LENGTH 100
-#define PID_LENGTH 25
 int pipeArray[2];
 
 int main(int argc, char *argv[])
@@ -32,7 +30,7 @@ void doExec(char *args[], int processNum)
         int pid = fork();
         if (pid == 0) // child process
         {
-            ev = execv("writef", arg, NULL);
+            ev = execv(args[2], arg, NULL);
             perror("Hata var");
             exit(0);
         }

@@ -8,7 +8,6 @@
 #define BUFF_LEN 64
 #define MAX_TOKEN 32
 #define MAX_INPUT 64
-#define HISTORY 64
 
 char commandInput[BUFF_LEN];
 char *token[MAX_TOKEN];
@@ -113,6 +112,7 @@ void cat()
     {
         printf("%s ", token[i]);
     }
+    printf("\n");
 }
 
 void runExecParam()
